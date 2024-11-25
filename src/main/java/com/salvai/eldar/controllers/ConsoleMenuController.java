@@ -116,9 +116,16 @@ public class ConsoleMenuController {
 
     }
 
-    private void getRates() {
-        // TODO: Consultar las tasas de todas las marcas por fecha.
-        //  (Si no se envía una fecha, se toma la fecha actual, formato dd-MM-yyyy)
+    private void getRates() throws ValidationException {
+        System.out.println("Fecha (dd-MM-yyyy)(Dejar vacio para usar la fecha actual): ");
+        String date = scanner.nextLine();
+
+        final var rates = creditCardService.getCreditCardBrandsRateByDate(date.trim());
+
+        System.out.println("Las tasas para las marcas son:");
+        for(var rate : rates){
+            System.out.printf("Marca (%s): %s%n", rate.brand(), rate.rate());
+        }
     }
 
 }
