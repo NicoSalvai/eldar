@@ -37,6 +37,12 @@ public abstract class Validator {
         }
     }
 
+    protected void longerOrEqualTo(String string, int minLength, String propertyName) {
+        if(string.length() < minLength){
+            errors.add("%s deberia de ser de %d caracteres o max".formatted(propertyName, minLength));
+        }
+    }
+
     protected void isDate(String date, String propertyName){
         try {
             LocalDate.parse(date, DATE_TIME_FORMATTER);
@@ -45,9 +51,29 @@ public abstract class Validator {
         }
     }
 
+    protected void isNumber(String number, String propertyName){
+        try {
+            Long.parseLong(number);
+        } catch (NumberFormatException ex){
+            errors.add("%s deberia ser un numero sin caracteres no numericos".formatted(propertyName));
+        }
+    }
+
     protected void isEmail(String email, String propertyName){
         if(!EmailValidator.getInstance().isValid(email)){
             errors.add("%s no es un email valido".formatted(propertyName));
+        }
+    }
+
+    protected void dateAfter(String date, LocalDate target, String propertyName) {
+        if(LocalDate.parse(date, DATE_TIME_FORMATTER).isBefore(target)){
+            errors.add("%s deberia ser posterior a la fecha actual (%s)".formatted(propertyName, target.toString()));
+        }
+    }
+
+    protected void dateBefore(String date, LocalDate target, String propertyName) {
+        if(LocalDate.parse(date, DATE_TIME_FORMATTER).isAfter(target)){
+            errors.add("%s deberia ser anterior a la fecha actual (%s)".formatted(propertyName, target.toString()));
         }
     }
 

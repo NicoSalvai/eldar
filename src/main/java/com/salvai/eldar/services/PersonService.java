@@ -27,4 +27,10 @@ public class PersonService {
 
         persons.add(new Person(firstName, lastName, dni, birthDateAsDate, email));
     }
+
+    public Person getPerson(String dni) throws ValidationException {
+        return persons.stream()
+            .filter(person -> person.dni().equals(dni)).findFirst()
+            .orElseThrow(() -> new ValidationException("No hay una persona registrada con ese DNI: \"%s\"".formatted(dni)));
+    }
 }

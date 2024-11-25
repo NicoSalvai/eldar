@@ -1,7 +1,9 @@
 package com.salvai.eldar.controllers;
 
 import com.salvai.eldar.models.enums.ConsoleMenuOption;
+import com.salvai.eldar.models.enums.CreditCardBrand;
 import com.salvai.eldar.models.exceptions.ValidationException;
+import com.salvai.eldar.services.CreditCardService;
 import com.salvai.eldar.services.PersonService;
 
 import java.util.Scanner;
@@ -12,6 +14,7 @@ import static com.salvai.eldar.models.enums.ConsoleMenuOption.SALIR;
 public class ConsoleMenuController {
     private final Scanner scanner = new Scanner(System.in);
     private final PersonService personService = new PersonService();
+    private final CreditCardService creditCardService = new CreditCardService();
 
     public void run() {
 
@@ -74,8 +77,26 @@ public class ConsoleMenuController {
         System.out.println("Persona registrada exitosamente.");
     }
 
-    private void addCreditCard() {
-        // TODO: Registrar una tarjeta indicando marca, número, fecha de vencimiento y nombre completo del titular
+    private void addCreditCard() throws ValidationException {
+        System.out.printf("Marca (%s): %n", CreditCardBrand.valuesToString());
+        String brand = scanner.nextLine();
+
+        System.out.println("Numero (Sin guiones ni puntos): ");
+        String number = scanner.nextLine();
+
+        System.out.println("Fecha de Vencimiento (dd-MM-yyyy): ");
+        String expirationDate = scanner.nextLine();
+
+        System.out.println("Nombre Completo Titular: ");
+        String fullName = scanner.nextLine();
+
+        System.out.println("DNI (sin puntos ni guiones): ");
+        String dni = scanner.nextLine();
+
+        var person = personService.getPerson(dni);
+
+        creditCardService.registerCreditCard(brand, number, fullName, person, expirationDate);
+        System.out.println("Tarjeta registrada exitosamente.");
     }
 
     private void getCreditCardsByDni() {
