@@ -1,6 +1,9 @@
 package com.salvai.eldar.services.validators;
 
+import com.salvai.eldar.models.enums.CreditCardBrand;
+
 import java.time.LocalDate;
+import java.util.Locale;
 
 public class CreditCardDataValidator extends Validator {
 
@@ -36,6 +39,11 @@ public class CreditCardDataValidator extends Validator {
     private void validateBrand(String brand){
         notEmpty(brand, BRAND);
         shorterOrEqualTo(brand, BRAND_MAX_LENGTH, BRAND);
+        try {
+            CreditCardBrand.valueOf(brand.toUpperCase());
+        } catch (IllegalArgumentException ex){
+            errors.add("%s (%s) is not a valid option".formatted(BRAND, brand));
+        }
     }
 
     private void validateCardNumber(String cardNumber){

@@ -9,4 +9,14 @@ public record CreditCard(CreditCardBrand brand, String number, Person person, St
     public boolean isValid() {
         return expirationDate.isAfter(LocalDate.now());
     }
+
+    @Override
+    public String toString() {
+        return """
+            --- Tarjeta
+            Marca: "%s"
+            Numero: "%s"
+            Fecha de Vencimiento: "%s"
+            Nombre Completo: "%s" """.formatted(brand, number, expirationDate, fullName);
+    }
 }

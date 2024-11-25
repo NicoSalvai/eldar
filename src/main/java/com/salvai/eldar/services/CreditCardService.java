@@ -22,7 +22,7 @@ public class CreditCardService {
                     creditCardDataValidator.getErrors());
         }
 
-        final var brandEnum = CreditCardBrand.valueOf(brand);
+        final var brandEnum = CreditCardBrand.valueOf(brand.toUpperCase());
         final var expirationDateAsDate = LocalDate.parse(expirationDate, Validator.DATE_TIME_FORMATTER);
 
         if(creditCards.stream().filter(CreditCard::isValid)
@@ -31,5 +31,12 @@ public class CreditCardService {
         }
 
         creditCards.add(new CreditCard(brandEnum, number, person, fullName, expirationDateAsDate));
+    }
+
+    public List<CreditCard> getCreditCardsByDni(String dni) throws ValidationException {
+        if(dni == null){
+            throw new ValidationException("El dni ingresado no deberia ser nulo");
+        }
+        return creditCards.stream().filter(creditCard -> creditCard.person().dni().equals(dni)).toList();
     }
 }

@@ -73,7 +73,7 @@ public class ConsoleMenuController {
         System.out.println("Email: ");
         String email = scanner.nextLine();
 
-        personService.registerPerson(firstName, lastName, dni, birthDate, email);
+        personService.registerPerson(firstName.trim(), lastName.trim(), dni.trim(), birthDate.trim(), email.trim());
         System.out.println("Persona registrada exitosamente.");
     }
 
@@ -93,14 +93,27 @@ public class ConsoleMenuController {
         System.out.println("DNI (sin puntos ni guiones): ");
         String dni = scanner.nextLine();
 
-        var person = personService.getPerson(dni);
+        var person = personService.getPerson(dni.trim());
 
-        creditCardService.registerCreditCard(brand, number, fullName, person, expirationDate);
+        creditCardService.registerCreditCard(brand.trim(), number.trim(), fullName.trim(), person, expirationDate.trim());
         System.out.println("Tarjeta registrada exitosamente.");
     }
 
-    private void getCreditCardsByDni() {
-        // TODO: Retornar información de las tarjetas asociadas de un usuario por dni
+    private void getCreditCardsByDni() throws ValidationException {
+        System.out.println("DNI (sin puntos ni guiones): ");
+        String dni = scanner.nextLine();
+
+        final var cards = creditCardService.getCreditCardsByDni(dni.trim());
+
+        if (cards.isEmpty()){
+            System.out.printf("No hay tajetas asociadas al dni (%s)%n", dni);
+        } else {
+            System.out.printf("Las tarjetas asociadas al dni (%s) son:%n", dni);
+            for(var card : cards){
+                System.out.println(card);
+            }
+        }
+
     }
 
     private void getRates() {

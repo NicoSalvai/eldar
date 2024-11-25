@@ -1,5 +1,7 @@
 package com.salvai.eldar.services.validators;
 
+import java.time.LocalDate;
+
 public class PersonDataValidator extends Validator {
 
     private static final String FIRST_NAME = "Nombre";
@@ -47,6 +49,7 @@ public class PersonDataValidator extends Validator {
         notEmpty(birthDate, BIRTH_DATE);
         shorterOrEqualTo(birthDate, DATE_TIME_FORMAT.length(), BIRTH_DATE);
         isDate(birthDate, BIRTH_DATE);
+        dateBefore(birthDate, LocalDate.now(), BIRTH_DATE);
     }
 
     private void validateEmail(String email) {
