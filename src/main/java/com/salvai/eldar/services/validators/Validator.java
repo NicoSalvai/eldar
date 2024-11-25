@@ -19,7 +19,7 @@ public abstract class Validator {
         this.errors = new ArrayList<>();
     }
 
-    public abstract boolean validate();
+    public abstract boolean isValid();
 
     protected void notEmpty(String string, String propertyName) {
         if(string == null) {

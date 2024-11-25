@@ -17,6 +17,6 @@ public record CreditCard(CreditCardBrand brand, String number, Person person, St
             Marca: "%s"
             Numero: "%s"
             Fecha de Vencimiento: "%s"
-            Nombre Completo: "%s" """.formatted(brand, number, expirationDate, fullName);
+            Nombre Completo: "%s"\s""".formatted(brand, number, expirationDate, fullName);
     }
 }

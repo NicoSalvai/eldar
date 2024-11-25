@@ -14,7 +14,7 @@ public class PersonService {
     public void registerPerson(String firstName, String lastName, String dni, String birthDate, String email) throws ValidationException {
 
         final var personDataValidator = new PersonDataValidator(firstName, lastName, dni, birthDate, email);
-        if(!personDataValidator.validate()){
+        if(personDataValidator.isValid()){
             throw new ValidationException("Hubo un problema al registrar la persona, revise los siguientes campos:",
                 personDataValidator.getErrors());
         }

@@ -26,13 +26,13 @@ public class PersonDataValidator extends Validator {
         this.email = email;
     }
 
-    public boolean validate(){
+    public boolean isValid(){
         validateName(firstName, FIRST_NAME);
         validateName(lastName, LAST_NAME);
         validateDni(dni);
         validateBirthDate(birthDate);
         validateEmail(email);
-        return errors.isEmpty();
+        return !errors.isEmpty();
     }
 
     private void validateName(String name, String propertyName){

@@ -3,7 +3,6 @@ package com.salvai.eldar.services.validators;
 import com.salvai.eldar.models.enums.CreditCardBrand;
 
 import java.time.LocalDate;
-import java.util.Locale;
 
 public class CreditCardDataValidator extends Validator {
 
@@ -28,12 +27,12 @@ public class CreditCardDataValidator extends Validator {
         this.fullName = fullName;
     }
 
-    public boolean validate(){
+    public boolean isValid(){
         validateBrand(brand);
         validateCardNumber(cardNumber);
         validateExpirationDate(expirationDate);
         validateFullName(fullName);
-        return errors.isEmpty();
+        return !errors.isEmpty();
     }
 
     private void validateBrand(String brand){

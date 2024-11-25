@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreditCardService {
-    private List<CreditCard> creditCards = new ArrayList<>();
+    private final List<CreditCard> creditCards = new ArrayList<>();
 
     public void registerCreditCard(String brand, String number, String fullName, Person person, String expirationDate) throws ValidationException {
 
         final var creditCardDataValidator = new CreditCardDataValidator(brand, number, fullName, expirationDate);
-        if(!creditCardDataValidator.validate()){
+        if(creditCardDataValidator.isValid()){
             throw new ValidationException("Hubo un problema al registrar la tarjeta, revise los siguientes campos:",
                     creditCardDataValidator.getErrors());
         }
