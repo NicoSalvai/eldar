@@ -5,6 +5,7 @@ import com.salvai.eldar.models.api.CreditCardRequest;
 import com.salvai.eldar.models.jpa.CreditCardEntity;
 import com.salvai.eldar.repositories.CreditCardRepository;
 import com.salvai.eldar.services.CreditCardService;
+import com.salvai.eldar.services.CreditCardValidatorService;
 import com.salvai.eldar.services.UserService;
 import com.salvai.eldar.transformers.CreditCardentityToDtoTransformer;
 import lombok.NonNull;
@@ -29,6 +30,9 @@ public class CreditCardServiceImpl implements CreditCardService {
     private final UserService userService;
 
     @NonNull
+    private final CreditCardValidatorService creditCardValidatorService;
+
+    @NonNull
     private final CreditCardentityToDtoTransformer creditCardentityToDtoTransformer;
 
     @Override
@@ -39,7 +43,7 @@ public class CreditCardServiceImpl implements CreditCardService {
                 "Credit Card with that number and brand already exists");
         }
 
-        // TODO Implement card number validation
+        creditCardValidatorService.validateCreditCardNumber(creditCardRequest.number());
 
         final var creditCardEntity = new CreditCardEntity();
         creditCardEntity.setBrand(creditCardRequest.brand());
@@ -81,4 +85,5 @@ public class CreditCardServiceImpl implements CreditCardService {
         int cvvNumber = random.nextInt(1000);
         return String.format("%03d", cvvNumber);
     }
+
 }
