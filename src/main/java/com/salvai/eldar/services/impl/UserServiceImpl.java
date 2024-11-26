@@ -51,7 +51,8 @@ public class UserServiceImpl implements UserService {
         return userEntityToDtoTransformer.convert(getUserEntityById(userId));
     }
 
-    protected UserEntity getUserEntityById(Integer userId){
+    @Override
+    public UserEntity getUserEntityById(Integer userId){
 
         return userRepository.findById(userId).orElseThrow(() ->
             new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));

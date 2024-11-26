@@ -25,4 +25,8 @@ public class UserEntity {
     private Integer dni;
     private LocalDate birthDate;
     private String email;
+
+    public String getFullName(){
+        return firstName + " " + lastName;
+    }
 }
