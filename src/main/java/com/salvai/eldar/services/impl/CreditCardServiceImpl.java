@@ -6,6 +6,7 @@ import com.salvai.eldar.models.jpa.CreditCardEntity;
 import com.salvai.eldar.repositories.CreditCardRepository;
 import com.salvai.eldar.services.CreditCardService;
 import com.salvai.eldar.services.CreditCardValidatorService;
+import com.salvai.eldar.services.EmailService;
 import com.salvai.eldar.services.UserService;
 import com.salvai.eldar.transformers.CreditCardentityToDtoTransformer;
 import jakarta.transaction.Transactional;
@@ -15,12 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.beans.Transient;
 import java.time.LocalDate;
 import java.util.Random;
 
@@ -28,6 +26,11 @@ import java.util.Random;
 @Slf4j
 @RequiredArgsConstructor
 public class CreditCardServiceImpl implements CreditCardService {
+
+    private static final String NEW_CREDIR_CARD_SUBJECT = "Congratulations on your new %s Credit Card";
+    private static final String NEW_CREDIR_CARD_CONTENT = """
+        These are the details of your card
+        PAN: %s - CVV: %s""";
 
     @NonNull
     private final CreditCardRepository creditCardRepository;
@@ -42,7 +45,7 @@ public class CreditCardServiceImpl implements CreditCardService {
     private final CreditCardentityToDtoTransformer creditCardentityToDtoTransformer;
 
     @NonNull
-    private final JavaMailSender javaMailSender;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -66,20 +69,9 @@ public class CreditCardServiceImpl implements CreditCardService {
 
         final var createdCreditCard = creditCardRepository.save(creditCardEntity);
 
-        try {
-            final var message = javaMailSender.createMimeMessage();
-            final var helper = new MimeMessageHelper(message);
-            helper.setFrom("salvaieldarchallenge@gmail.com");
-            helper.setTo(userEntity.getEmail());
-            helper.setSubject("Congratulations on your new %s Credit Card".formatted(createdCreditCard.getBrand()));
-            helper.setText("""
-                These are the details of your card
-                PAN: %s - CVV: %s""".formatted(createdCreditCard.getNumber(), createdCreditCard.getCvv()));
-
-            javaMailSender.send(message);
-        } catch (Exception ex){
-            log.error("It was not possible to send the email with the credit card details to %s".formatted(userEntity.getEmail()));
-        }
+        final var subject = NEW_CREDIR_CARD_SUBJECT.formatted(createdCreditCard.getBrand());
+        final var content = NEW_CREDIR_CARD_CONTENT.formatted(createdCreditCard.getNumber(), createdCreditCard.getCvv());
+        emailService.sendEmail(userEntity.getEmail(), subject, content);
 
         return creditCardentityToDtoTransformer.convert(createdCreditCard);
     }
