@@ -86,7 +86,8 @@ public class CreditCardServiceImpl implements CreditCardService {
         return creditCardentityToDtoTransformer.convert(getCreditCardEntityById(creditCardId));
     }
 
-    protected CreditCardEntity getCreditCardEntityById(Integer creditCardId){
+    @Override
+    public CreditCardEntity getCreditCardEntityById(Integer creditCardId){
         return creditCardRepository.findById(creditCardId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Credit card not found"));
     }
@@ -103,4 +104,10 @@ public class CreditCardServiceImpl implements CreditCardService {
         return String.format("%03d", cvvNumber);
     }
 
+    @Override
+    public String maskCreditCardNumber(String creditCardNumber){
+        final var firstFourDigits = creditCardNumber.substring(0, Math.min(creditCardNumber.length(), 4));
+        final var trailingDigitCount = Math.max(creditCardNumber.length() - 4, 0);
+        return firstFourDigits + "X".repeat(trailingDigitCount);
+    }
 }
