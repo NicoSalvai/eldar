@@ -8,18 +8,24 @@ import com.salvai.eldar.services.CreditCardService;
 import com.salvai.eldar.services.CreditCardValidatorService;
 import com.salvai.eldar.services.UserService;
 import com.salvai.eldar.transformers.CreditCardentityToDtoTransformer;
+import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.beans.Transient;
 import java.time.LocalDate;
 import java.util.Random;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CreditCardServiceImpl implements CreditCardService {
 
@@ -35,7 +41,11 @@ public class CreditCardServiceImpl implements CreditCardService {
     @NonNull
     private final CreditCardentityToDtoTransformer creditCardentityToDtoTransformer;
 
+    @NonNull
+    private final JavaMailSender javaMailSender;
+
     @Override
+    @Transactional
     public CreditCardDto addCreditCard(CreditCardRequest creditCardRequest) {
         if(creditCardRepository.findByBrandAndNumberAndExpirationDateAfter(
             creditCardRequest.brand(), creditCardRequest.number(), LocalDate.now()).isPresent()){
@@ -45,16 +55,31 @@ public class CreditCardServiceImpl implements CreditCardService {
 
         creditCardValidatorService.validateCreditCardNumber(creditCardRequest.number());
 
+        final var userEntity = userService.getUserEntityById(creditCardRequest.userId());
+
         final var creditCardEntity = new CreditCardEntity();
         creditCardEntity.setBrand(creditCardRequest.brand());
         creditCardEntity.setNumber(creditCardRequest.number());
-        creditCardEntity.setUserEntity(userService.getUserEntityById(creditCardRequest.userId()));
+        creditCardEntity.setUserEntity(userEntity);
         creditCardEntity.setExpirationDate(creditCardRequest.expirationDate());
         creditCardEntity.setCvv(generateCVV());
 
         final var createdCreditCard = creditCardRepository.save(creditCardEntity);
 
-        // TODO Implement email sending to user;
+        try {
+            final var message = javaMailSender.createMimeMessage();
+            final var helper = new MimeMessageHelper(message);
+            helper.setFrom("salvaieldarchallenge@gmail.com");
+            helper.setTo(userEntity.getEmail());
+            helper.setSubject("Congratulations on your new %s Credit Card".formatted(createdCreditCard.getBrand()));
+            helper.setText("""
+                These are the details of your card
+                PAN: %s - CVV: %s""".formatted(createdCreditCard.getNumber(), createdCreditCard.getCvv()));
+
+            javaMailSender.send(message);
+        } catch (Exception ex){
+            log.error("It was not possible to send the email with the credit card details to %s".formatted(userEntity.getEmail()));
+        }
 
         return creditCardentityToDtoTransformer.convert(createdCreditCard);
     }
