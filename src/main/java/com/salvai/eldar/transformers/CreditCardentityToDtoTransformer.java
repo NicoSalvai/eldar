@@ -5,8 +5,6 @@ import com.salvai.eldar.models.jpa.CreditCardEntity;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-
 @Component
 public class CreditCardentityToDtoTransformer implements Converter<CreditCardEntity, CreditCardDto> {
 
@@ -19,6 +17,6 @@ public class CreditCardentityToDtoTransformer implements Converter<CreditCardEnt
             source.getExpirationDate(),
             source.getUserEntity().getId(),
             source.getUserEntity().getFullName(),
-            source.getExpirationDate().isAfter(LocalDate.now()));
+            source.isValid());
     }
 }

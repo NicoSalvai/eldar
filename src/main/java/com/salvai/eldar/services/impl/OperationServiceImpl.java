@@ -58,6 +58,10 @@ public class OperationServiceImpl implements OperationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The CVV is not valid");
         }
 
+        if (!creditCardEntity.isValid()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The credit card has expired");
+        }
+
         final var operationRateDto = rateService.getOperationRate(creditCardEntity.getBrand(), operationRequest.amount());
 
         final var operationEntity = new OperationEntity();

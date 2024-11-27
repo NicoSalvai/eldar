@@ -20,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,9 +71,33 @@ class OperationServiceImplTest {
     }
 
     @Test
+    void addOperation_whenCreditCardExpired_thenThrowResponseStatusException() {
+        final var creditCardId = 1;
+        final var cvv = "123";
+        final var expirationDate = LocalDate.now().minusDays(2);
+        final var details = "details";
+        final var amount = 100;
+        final var operationRequest = new OperationRequest(amount, details, cvv);
+
+        final var creditCardEntity = new CreditCardEntity();
+        creditCardEntity.setCvv(cvv);
+        creditCardEntity.setExpirationDate(expirationDate);
+
+        when(creditCardService.getCreditCardEntityById(eq(creditCardId)))
+            .thenReturn(creditCardEntity);
+
+        assertThatThrownBy(() ->operationService.addOperation(creditCardId, operationRequest))
+            .isInstanceOf(ResponseStatusException.class)
+            .hasMessage("400 BAD_REQUEST \"The credit card has expired\"");
+
+        verify(creditCardService).getCreditCardEntityById(eq(creditCardId));
+    }
+
+    @Test
     void addOperation_whenOk_thenCreateOperationAndSendEmailToUser() {
         final var creditCardId = 1;
         final var creditCardBrand = CreditCardBrand.AMEX;
+        final var expirationDate = LocalDate.now().plusDays(100);
         final var cardNumber = "123456789123456";
         final var maskedCardNumber = "1234XXXXXXXXXXXX";
         final var userEmail = "nicolas.salvai@example.com";
@@ -88,6 +114,7 @@ class OperationServiceImplTest {
         creditCardEntity.setBrand(creditCardBrand);
         creditCardEntity.setUserEntity(userEntity);
         creditCardEntity.setNumber(cardNumber);
+        creditCardEntity.setExpirationDate(expirationDate);
 
         final var operationRateDto = new OperationRateDto(5d, 5d, 105d);
 

@@ -23,4 +23,8 @@ public class CreditCardEntity {
 
     @ManyToOne
     private UserEntity userEntity;
+
+    public boolean isValid(){
+        return expirationDate.isAfter(LocalDate.now());
+    }
 }
